@@ -14,6 +14,8 @@ figures, native Typst mathematics, and exact physical export sizes.
 
 Explore the [example gallery](docs/gallery/README.md) for PDFs, previews, and
 runnable source, or read the [support matrix](docs/support.md) for current limits.
+The gallery includes column-width plots, heatmaps with colorbars, mixed
+vector/raster panels, and annotations with native Typst mathematics.
 
 ## Requirements
 
@@ -112,6 +114,11 @@ ax.legend()
 
 plotst.savefig(fig, "figure.pdf")
 ```
+
+Use `layout="constrained"` to let Matplotlib fit the axes, titles, labels, and
+colorbars within the requested page size using Typst's text measurements.
+The gallery's single-axis examples use this to keep outer whitespace small
+while preserving room for their text.
 
 For a paper column with a fixed final width and little outer whitespace, use
 `tight_width_mm`. Plotst fits the plotted area to the requested width without

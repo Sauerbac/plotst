@@ -71,8 +71,8 @@ def log_scientific_colorbar() -> Figure:
 
     figure, axis = plt.subplots(
         figsize=(148 / 25.4, 88 / 25.4),
+        layout="constrained",
     )
-    figure.subplots_adjust(left=0.11, right=0.82, bottom=0.17, top=0.87)
     mesh = axis.pcolormesh(
         frequency,
         elapsed,
@@ -225,8 +225,8 @@ def annotation_showcase() -> Figure:
 
     figure, axis = plt.subplots(
         figsize=(156 / 25.4, 92 / 25.4),
+        layout="constrained",
     )
-    figure.subplots_adjust(left=0.13, right=0.975, bottom=0.17, top=0.82)
     axis.fill_between(
         time,
         -envelope,
@@ -334,8 +334,10 @@ def typst_math_demo() -> Figure:
     """Typst counterpart to Matplotlib's TeX rendering demonstration."""
     time = np.linspace(0, 1, 400)
     velocity = np.cos(4 * np.pi * time) + 2
-    figure, axis = plt.subplots(figsize=(156 / 25.4, 88 / 25.4))
-    figure.subplots_adjust(left=0.17, right=0.96, bottom=0.19, top=0.74)
+    figure, axis = plt.subplots(
+        figsize=(156 / 25.4, 88 / 25.4),
+        layout="constrained",
+    )
     axis.plot(time, velocity, color=BLUE, linewidth=1.8)
     axis.fill_between(time, 2, velocity, color=CYAN, alpha=0.12)
     axis.axhline(2, color=INK, linewidth=0.7, alpha=0.45)
