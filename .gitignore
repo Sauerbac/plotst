@@ -1,0 +1,12 @@
+.venv/
+.uv-cache/
+.mplconfig/
+.pytest_cache/
+__pycache__/
+dist/
+tmp/
+*.pyc
+
+# Local development history and generated examples never ship.
+/archive/
+/output/

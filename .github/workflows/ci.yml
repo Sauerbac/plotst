@@ -1,0 +1,105 @@
+name: Windows CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }} / Typst 0.15.0
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12', '3.13', '3.14']
+    env:
+      PYTHONUTF8: '1'
+      MPLCONFIGDIR: ${{ runner.temp }}/matplotlib
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: '0.9.26'
+          python-version: ${{ matrix.python }}
+          enable-cache: true
+      - uses: typst-community/setup-typst@9107b8dd77d7a7fd6c5faebbb507cac28069042e # v5
+        with:
+          typst-version: '0.15.0'
+      - name: Install PDF renderer and test font
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $toolsDir = Join-Path $env:RUNNER_TEMP 'plotst-tools'
+          $fontsDir = Join-Path $toolsDir 'fonts'
+          New-Item -ItemType Directory -Path $fontsDir -Force | Out-Null
+          $font = Join-Path $fontsDir 'STIXTwoMath-Regular.otf'
+          Invoke-WebRequest 'https://raw.githubusercontent.com/stipub/stixfonts/v2.13b171/fonts/static_otf/STIXTwoMath-Regular.otf' -OutFile $font
+          if ((Get-FileHash $font).Hash -ne '3A5F3F26F40D5698B3C62DD085D48D6663696A3F80825AAB8B553D5097518E8C') {
+            throw 'STIX font checksum mismatch'
+          }
+          "TYPST_FONT_PATHS=$fontsDir" >> $env:GITHUB_ENV
+          $zip = Join-Path $toolsDir 'poppler.zip'
+          Invoke-WebRequest 'https://github.com/oschwartz10612/poppler-windows/releases/download/v26.09.0-0/Release-26.09.0-0.zip' -OutFile $zip
+          if ((Get-FileHash $zip).Hash -ne '7A6F256A0DDF7536182246A5733331BF4677CBCC34F4663774947AD34556C8D0') {
+            throw 'Poppler checksum mismatch'
+          }
+          Expand-Archive -LiteralPath $zip -DestinationPath (Join-Path $toolsDir 'poppler')
+          $renderers = @(Get-ChildItem (Join-Path $toolsDir 'poppler') -Filter pdftoppm.exe -Recurse)
+          if ($renderers.Count -ne 1) { throw 'Expected exactly one pdftoppm executable' }
+          $renderers[0].DirectoryName >> $env:GITHUB_PATH
+      - name: Check required tools and fonts
+        shell: pwsh
+        run: |
+          typst --version
+          if ($LASTEXITCODE -ne 0) { throw 'Typst is unavailable' }
+          pdftoppm -v
+          if ($LASTEXITCODE -ne 0) { throw 'Poppler is unavailable' }
+          $fonts = typst fonts
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot list Typst fonts' }
+          foreach ($font in @('New Computer Modern', 'New Computer Modern Math', 'STIX Two Math')) {
+            if ($font -notin $fonts) { throw "Missing required font: $font" }
+          }
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - name: Run tests including visual assertions
+        run: uv run --locked pytest -q
+      - name: Generate ordinary example
+        run: uv run --locked python examples/ordinary.py
+      - name: Generate column-width example
+        run: uv run --locked python examples/column_width.py
+      - name: Generate representative examples
+        run: uv run --locked python examples/representative_figures.py
+      - name: Build source distribution and wheel
+        run: uv build
+      - name: Verify a fresh wheel installation
+        shell: pwsh
+        run: |
+          $smokeEnv = Join-Path $env:RUNNER_TEMP 'plotst-wheel'
+          uv venv $smokeEnv
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot create smoke environment' }
+          $python = Join-Path $smokeEnv 'Scripts/python.exe'
+          $wheels = @(Get-ChildItem dist -Filter '*.whl')
+          if ($wheels.Count -ne 1) { throw 'Expected exactly one wheel' }
+          uv pip install --python $python $wheels[0].FullName
+          if ($LASTEXITCODE -ne 0) { throw 'Wheel installation failed' }
+          & $python -I scripts/smoke_install.py
+          if ($LASTEXITCODE -ne 0) { throw 'Installed package smoke test failed' }
+      - name: Retain example PDFs and packages
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: plotst-python-${{ matrix.python }}
+          path: |
+            output/pdf/*.pdf
+            dist/*
+          if-no-files-found: error
+          retention-days: 7
