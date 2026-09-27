@@ -66,7 +66,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Poppler is unavailable' }
           $fonts = typst fonts
           if ($LASTEXITCODE -ne 0) { throw 'Cannot list Typst fonts' }
-          foreach ($font in @('New Computer Modern', 'New Computer Modern Math', 'STIX Two Math')) {
+          foreach ($font in @('New Computer Modern', 'New Computer Modern Math', 'STIX Two Math', 'Comic Sans MS', 'Georgia', 'Cambria Math')) {
             if ($font -notin $fonts) { throw "Missing required font: $font" }
           }
       - name: Install locked dependencies
@@ -79,6 +79,10 @@ jobs:
         run: uv run --locked python examples/column_width.py
       - name: Generate representative examples
         run: uv run --locked python examples/representative_figures.py
+      - name: Generate font showcases
+        run: uv run --locked python examples/font_showcases.py
+      - name: Generate three-body orbit showcase
+        run: uv run --locked python examples/three_body_orbit.py
       - name: Build source distribution and wheel
         run: uv build
       - name: Verify a fresh wheel installation

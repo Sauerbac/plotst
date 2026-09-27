@@ -13,6 +13,9 @@ FIGURES = (
     "representative-mixed-vector-raster",
     "representative-annotations",
     "representative-typst-math",
+    "showcase-wave-interference",
+    "showcase-monkey-saddle",
+    "showcase-three-body-hs273",
 )
 
 

@@ -18,6 +18,9 @@ These examples exercise the supported PDF surface, not general Matplotlib compat
 | Annotation-rich composition | Arrows, anchored rotation, Matplotlib-managed multiline labels, tall math, PDF links |
 | Typst math plot | Math-rich title, serif prose, bold and italic labels, extractable PDF text |
 | Column-width figure | Exact 85 mm final width with content cropping and unchanged font sizes |
+| Wave interference | Comic Sans MS text with Cambria Math, raster field, vector nodal contours, colorbar and cross-section |
+| Monkey saddle | Georgia text with New Computer Modern Math, 2D surface height map, vector contours and circular sections |
+| HS.273 three-body orbit | Vector trajectories, speed-colored detail, clipped line collections, separation diagnostics, tall native math and a PDF source link |
 
 ## Automated coverage
 
@@ -26,6 +29,7 @@ These examples exercise the supported PDF surface, not general Matplotlib compat
 - `tests/test_math_fonts.py`: changing the math font changes the embedded font while preserving text and page width.
 - `tests/test_tight_width.py`: exact column width, figure state restoration, and rendered margins.
 - `tests/test_setup.py` and `tests/test_errors.py`: configuration, compiler diagnostics, and unsupported inputs.
+- `tests/test_orbit_example.py`: full-period state closure, energy, momentum, and catalogue-scale physical checks for the gallery integrator.
 
 ## Boundaries
 

@@ -14,8 +14,11 @@ figures, native Typst mathematics, and exact physical export sizes.
 
 Explore the [example gallery](docs/gallery/README.md) for PDFs, previews, and
 runnable source, or read the [support matrix](docs/support.md) for current limits.
-The gallery includes column-width plots, heatmaps with colorbars, mixed
-vector/raster panels, and annotations with native Typst mathematics.
+The gallery includes playful wave interference, a monkey-saddle landscape,
+and a locally computed three-body orbit, alongside column-width plots, heatmaps,
+mixed vector/raster panels, and annotations with native Typst mathematics.
+The showcases pair Comic Sans MS with Cambria Math and Georgia with New Computer
+Modern Math to demonstrate independent text and equation fonts.
 
 ## Requirements
 
@@ -63,11 +66,17 @@ uv sync --locked
 uv run python examples\ordinary.py
 uv run python examples\column_width.py
 uv run python examples\representative_figures.py
+uv run python examples\font_showcases.py
+uv run python examples\three_body_orbit.py
 ```
 
 The example writes `output/pdf/plotst-ordinary.pdf` at exactly 120 mm by 80 mm.
 Generated files under `output/` are ignored by Git. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for tests, builds, and gallery maintenance.
+The font and orbit showcases additionally need Windows' Comic Sans MS, Georgia,
+and Cambria Math; `typst fonts` lists available families. The orbit is integrated
+locally with NumPy, using the linked catalogue's initial conditions, and needs
+no network access or additional numerical packages.
 
 ## Representative support figures
 
