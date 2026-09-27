@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+import errno
+import os
 import shutil
 import subprocess
+import tempfile
 
 import matplotlib
 
@@ -82,3 +85,35 @@ def test_tight_export_rejects_invalid_width(tmp_path: Path, width: float) -> Non
             plotst.savefig(figure, tmp_path / "invalid.pdf", tight_width_mm=width)
     finally:
         plt.close(figure)
+
+
+def test_tight_export_handles_output_on_another_drive(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    system_temp = tmp_path / "system-temp"
+    output_drive = tmp_path / "other-drive"
+    system_temp.mkdir()
+    output_drive.mkdir()
+    monkeypatch.setattr(tempfile, "tempdir", str(system_temp))
+    destination = output_drive / "column.pdf"
+    original_replace = os.replace
+
+    def replace_on_same_drive(source, target, *args, **kwargs):
+        # Model the OS boundary even on machines with only one real drive.
+        if Path(target) == destination and not Path(source).is_relative_to(output_drive):
+            raise OSError(errno.EXDEV, "Cannot move a file to a different disk drive")
+        return original_replace(source, target, *args, **kwargs)
+
+    monkeypatch.setattr(os, "replace", replace_on_same_drive)
+    plotst.setup()
+    figure, axis = plt.subplots(figsize=(3.5, 2), layout="constrained")
+    axis.plot([0, 1], [0, 1])
+    axis.set_title("Export across drives")
+    try:
+        plotst.savefig(figure, destination, tight_width_mm=85)
+    finally:
+        plt.close(figure)
+    page = PdfReader(destination).pages[0]
+    assert float(page.mediabox.width) == pytest.approx(85 / 25.4 * 72, abs=0.01)
+    assert "Export across drives" in page.extract_text()
+    assert list(output_drive.iterdir()) == [destination]

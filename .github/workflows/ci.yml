@@ -72,7 +72,7 @@ jobs:
       - name: Install locked dependencies
         run: uv sync --locked
       - name: Run tests including visual assertions
-        run: uv run --locked pytest -q
+        run: uv run --locked pytest -q -W error::plotst.UntestedTypstWarning
       - name: Generate ordinary example
         run: uv run --locked python examples/ordinary.py
       - name: Generate column-width example

@@ -11,6 +11,7 @@ from ._warnings import UntestedTypstWarning
 
 
 _TESTED_TYPST = "typst 0.15.0 (c98e9103)"
+_TESTED_TYPST_BUILDS = (_TESTED_TYPST, "typst 0.15.0 (3ae52774)")
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,9 +50,10 @@ def setup(
             "Install Typst or pass its path to plotst.setup(typst=...)."
         ) from error
     typst_version = result.stdout.strip()
-    if typst_version != _TESTED_TYPST:
+    if typst_version not in _TESTED_TYPST_BUILDS:
         warnings.warn(
-            f"Plotst is tested with {_TESTED_TYPST}; the configured executable "
+            f"Plotst is tested with {' or '.join(_TESTED_TYPST_BUILDS)}; "
+            "the configured executable "
             f"reports {typst_version!r}.",
             UntestedTypstWarning,
             stacklevel=2,

@@ -23,7 +23,8 @@ runnable source, or read the [support matrix](docs/support.md) for current limit
 - Matplotlib 3.11.0 and pypdf 6.10.0 (installed with Plotst).
 - New Computer Modern text and math fonts (included in the official Typst CLI).
 
-The compiler version is `typst 0.15.0 (c98e9103)`. Other builds trigger a warning.
+Verified compiler builds are the official `typst 0.15.0 (3ae52774)` release and
+the original local `typst 0.15.0 (c98e9103)` build. Other builds trigger a warning.
 Windows is the current support target; macOS and Linux have not been verified.
 
 ## Install from GitHub

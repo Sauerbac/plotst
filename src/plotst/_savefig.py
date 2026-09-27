@@ -52,7 +52,8 @@ def savefig(
     _reject_rasterized_text(figure)
     original_canvas = figure.canvas
     original_size = figure.get_size_inches().copy()
-    with TemporaryDirectory(prefix="plotst-") as temporary:
+    # The final tight PDF is renamed atomically; keep it on the output drive.
+    with TemporaryDirectory(prefix="plotst-", dir=destination.parent) as temporary:
         compiler = TypstCompiler(Path(temporary), config)
         canvas = TypstCanvas(figure, compiler)
         try:
