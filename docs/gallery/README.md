@@ -11,6 +11,25 @@ Each example below links to its runnable source.
 
 Run the commands from the repository root after `uv sync --locked`.
 
+## Common Matplotlib formatters
+
+Six panels demonstrate concise dates across midnight in UTC, dataset categories
+containing literal punctuation, percentages, engineering prefixes with an
+additive offset, locale-aware scalar numbers, and explicit custom formatter
+adapters. The custom panel includes a subclass that computes its offset from
+the whole tick batch and a conversion callback that colors its voltage labels.
+210 x 140 mm, using only the bundled New Computer Modern fonts.
+
+The preview uses German decimal commas and grouping. `--locale de-DE` explicitly
+selects this locale in the example process on Windows; Plotst itself never
+changes the locale. Omit the option to keep the process's current locale, or
+choose another locale installed on your system. General label helpers and
+string-default changes remain outside this feature.
+
+[![Dates, categories, percentages, engineering units, locale numbers, and custom formatter adapters](formatter-compatibility.png)](formatter-compatibility.pdf)
+
+[Source](../../examples/formatter_compatibility.py) · `uv run python examples/formatter_compatibility.py --locale de-DE`
+
 ## When ripples meet
 
 An idealized equal-amplitude snapshot of two coherent sources makes an

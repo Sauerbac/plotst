@@ -17,6 +17,7 @@ These examples exercise the supported PDF surface, not general Matplotlib compat
 | Mixed vector/raster panels | Multiple axes, raster image, vector lines and markers, uncertainty bands, legend and colorbar |
 | Annotation-rich composition | Arrows, anchored rotation, Matplotlib-managed multiline labels, tall math, PDF links |
 | Typst math plot | Math-rich title, serif prose, bold and italic labels, extractable PDF text |
+| [Formatter compatibility](gallery/README.md#common-matplotlib-formatters) | Concise dates across midnight, literal categories, percentages, engineering offsets, German numeric locale, custom subclass and conversion callback |
 | Column-width figure | Exact 85 mm final width with content cropping and unchanged font sizes |
 | Wave interference | Comic Sans MS text with Cambria Math, raster field, vector nodal contours, colorbar and cross-section |
 | Monkey saddle | Georgia text with New Computer Modern Math, 2D surface height map, vector contours and circular sections |
@@ -25,6 +26,7 @@ These examples exercise the supported PDF surface, not general Matplotlib compat
 ## Automated coverage
 
 - `tests/test_savefig.py`: dimensions, layout, generated numeric labels, vector/raster output, and page edges.
+- `tests/test_formatters.py`: dates/timezones, categories, percentage precision, engineering units/offsets, locale formatting, custom batch adapters, and shared-axis state restoration.
 - `tests/test_pdf_composition.py`: PDF drawing order, transforms, clipping, alpha, links, and text geometry.
 - `tests/test_math_fonts.py`: changing the math font changes the embedded font while preserving text and page width.
 - `tests/test_tight_width.py`: exact column width, figure state restoration, and rendered margins.
@@ -33,12 +35,25 @@ These examples exercise the supported PDF surface, not general Matplotlib compat
 
 ## Boundaries
 
-Built-in scalar and logarithmic formatters are adapted during export and restored
-afterward. Custom formatters must return valid Typst content. User labels accept
-Typst prose and math; they are not interpreted as LaTeX or arbitrary Mathtext.
+Exact built-in scalar/logarithmic, date (`DateFormatter`, `AutoDateFormatter`,
+`ConciseDateFormatter`), category (`StrCategoryFormatter`), percentage, and
+engineering formatters are adapted during export and restored afterward.
+Dates retain their batch context, timezone, and shared offset. Category strings,
+date callbacks, units, and symbols are treated as text. Engineering and
+locale-aware scalar formatters use upstream plain-output mode; localized
+scientific offsets use `1eN` notation. Existing locale settings are honored,
+never changed. Engineering mantissas follow Matplotlib's non-localized behavior.
 
-Unsupported areas include polar/3D axes, date/category/locale formatters,
-arbitrary formatter subclasses, `text.usetex`, path effects, complex clipping,
+Unwrapped custom formatters and subclasses still return valid Typst content.
+`plotst.adapt_formatter(formatter)` explicitly opts plain-output custom
+formatters into escaping; an optional `convert` callback defines custom
+conversion to Typst. Batch overrides, locations, axis/locator context, and
+offsets are forwarded. This is a formatter-only contract; user-label semantics
+are unchanged. User labels accept Typst prose and math; they are not interpreted
+as LaTeX or arbitrary Mathtext.
+
+Unsupported areas include polar/3D axes, automatic conversion of arbitrary
+formatter subclasses or user-generated Mathtext/LaTeX, `text.usetex`, path effects, complex clipping,
 Typst-internal multiline blocks or explicit movement, rasterized text or text
 containers, arbitrary `bbox_inches` settings, interactive output, and SVG/PNG export.
 Gallery PNGs are previews rendered from the PDF by Poppler.

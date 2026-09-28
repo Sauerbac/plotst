@@ -8,6 +8,7 @@ from ._errors import (
     UnsupportedFeatureError,
 )
 from ._savefig import savefig
+from ._formatters import adapt_formatter
 from ._warnings import UntestedTypstWarning
 
 __all__ = [
@@ -16,6 +17,7 @@ __all__ = [
     "TypstNotFoundError",
     "UntestedTypstWarning",
     "UnsupportedFeatureError",
+    "adapt_formatter",
     "savefig",
     "setup",
 ]

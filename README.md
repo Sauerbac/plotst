@@ -17,6 +17,9 @@ runnable source, or read the [support matrix](docs/support.md) for current limit
 The gallery includes playful wave interference, a monkey-saddle landscape,
 and a locally computed three-body orbit, alongside column-width plots, heatmaps,
 mixed vector/raster panels, and annotations with native Typst mathematics.
+The [formatter showcase](docs/gallery/README.md#common-matplotlib-formatters)
+demonstrates dates, categories, percentages, engineering units, locale-aware
+numbers, and custom formatter adapters.
 The showcases pair Comic Sans MS with Cambria Math and Georgia with New Computer
 Modern Math to demonstrate independent text and equation fonts.
 
@@ -66,6 +69,7 @@ uv sync --locked
 uv run python examples\ordinary.py
 uv run python examples\column_width.py
 uv run python examples\representative_figures.py
+uv run python examples\formatter_compatibility.py --locale de-DE
 uv run python examples\font_showcases.py
 uv run python examples\three_body_orbit.py
 ```
@@ -73,6 +77,10 @@ uv run python examples\three_body_orbit.py
 The example writes `output/pdf/plotst-ordinary.pdf` at exactly 120 mm by 80 mm.
 Generated files under `output/` are ignored by Git. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for tests, builds, and gallery maintenance.
+The formatter example writes `output/pdf/formatter-compatibility.pdf`.
+Its optional `--locale de-DE` selects German numeric formatting for the example
+on Windows; omit it to use the process's current locale. Plotst does not select
+the locale itself.
 The font and orbit showcases additionally need Windows' Comic Sans MS, Georgia,
 and Cambria Math; `typst fonts` lists available families. The orbit is integrated
 locally with NumPy, using the linked catalogue's initial conditions, and needs
@@ -153,6 +161,8 @@ deferred; the current interface is Python-only.
   constrained layout.
 - Built-in scalar and logarithmic ticks, including scientific/additive offsets
   and colorbar ticks produced by Matplotlib's standard formatters.
+- Date and category ticks, percentages, engineering units, and locale-aware
+  scalar ticks, including their shared offsets.
 - Native Typst prose and inline math in user-authored labels.
 - One Typst inline label per Matplotlib text line. Use Python `\n` when
   Matplotlib should manage multiple lines.
@@ -164,12 +174,65 @@ deferred; the current interface is Python-only.
 - Real PDF text where Typst emits it; the ordinary example is not rasterized.
 
 During an export, Plotst adapts exact instances of Matplotlib's
-`ScalarFormatter`, `LogFormatter`, `LogFormatterMathtext`, and
-`LogFormatterSciNotation`. Literal output is escaped as text, while the narrow
-numeric Mathtext grammar emitted by those formatters is translated to Typst.
-The original formatter objects are restored after the export, including after
-an error. Formatter subclasses and other custom formatters are not replaced;
-they must return valid Typst label content.
+`ScalarFormatter`, `LogFormatter`, `LogFormatterMathtext`,
+`LogFormatterSciNotation`, `DateFormatter`, `AutoDateFormatter`,
+`ConciseDateFormatter`, `StrCategoryFormatter`, `PercentFormatter`, and
+`EngFormatter`. Date labels retain their timezone, formatting, and shared date
+offset. Categories, percentage symbols, engineering units, and date callback
+results are escaped as text, including dollar signs and underscores. Real
+newlines remain Matplotlib-managed lines.
+
+Numeric scalar/log Mathtext uses a narrow translation to Typst. Engineering
+formatters and locale-aware scalar formatters use Matplotlib's plain-output
+mode during export, even when configured with `useMathText=True`. Engineering
+prefixes, units, precision, and offsets remain intact; localized scalar
+scientific offsets use plain `1eN` notation. Plotst honors the existing Python
+locale and `useLocale` setting; it does not select or change the process locale.
+`EngFormatter` does not localize its engineering mantissas in Matplotlib.
+Date TeX wrappers are likewise disabled on the export copy; user-provided LaTeX
+in date formats, callbacks, units, or symbols is not translated.
+
+Automatic adapters use shallow export-local copies. The original formatter
+objects, axis associations, and automatic-formatter flags are restored after
+export, including after an error. Subclasses and other custom formatters are
+not automatically replaced; their existing contract remains valid Typst label
+content. These changes do not alter title/axis-label strings or introduce
+general text/markup helpers.
+
+### Custom formatter adapter
+
+See [the runnable formatter showcase](examples/formatter_compatibility.py) for
+all supported families, a batch-aware subclass, and a custom conversion hook.
+
+Opt an existing formatter or subclass that produces plain text into escaping:
+
+```python
+from matplotlib.ticker import FuncFormatter
+
+formatter = FuncFormatter(lambda value, position: f"sample_{value:g}")
+ax.xaxis.set_major_formatter(plotst.adapt_formatter(formatter))
+```
+
+`adapt_formatter` takes a Matplotlib `Formatter` instance. Its default
+conversion escapes completed tick labels and offsets as literal text. For
+numeric subclasses, configure `useMathText=False` and `usetex=False`; this
+wrapper does not detect or translate Mathtext or LaTeX. A formatter already
+producing Typst can continue to be installed directly without a wrapper.
+
+For a custom conversion, pass `convert=callable`. It receives one completed
+string at a time (including empty strings and offset strings) and must return
+valid Typst content. The same callback applies to individual calls, batch
+results, and offsets. The formatter retains responsibility for formatting
+values; the callback only converts the resulting labels.
+
+The adapter forwards axis and locator assignment, tick locations, the full
+`format_ticks(values)` batch, and `get_offset()`. This preserves custom batch
+logic rather than reducing it to individual calls. `format_data` and
+`format_data_short` delegate without conversion. The wrapped formatter's
+normal draw-time state may change. Install the wrapper with Matplotlib's
+major/minor formatter setters; wrapped subclasses are never automatically
+treated as built-ins. A wrapper emits Typst source and is intended for Plotst
+exports, not ordinary Matplotlib rendering.
 
 Typst-internal multiline blocks, explicit movement, baseline shifts, page
 operations, deliberate overflow, arbitrary `bbox_inches` options, rasterized text or

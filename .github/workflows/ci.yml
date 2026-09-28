@@ -79,6 +79,8 @@ jobs:
         run: uv run --locked python examples/column_width.py
       - name: Generate representative examples
         run: uv run --locked python examples/representative_figures.py
+      - name: Generate formatter compatibility example
+        run: uv run --locked python examples/formatter_compatibility.py --locale de-DE
       - name: Generate font showcases
         run: uv run --locked python examples/font_showcases.py
       - name: Generate three-body orbit showcase
