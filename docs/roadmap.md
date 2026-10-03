@@ -90,7 +90,7 @@ This sequence can change as experiments reveal effort or dependencies. Early API
 
 ## References
 
-- [Current usage and supported contract](../README.md)
+- [Current usage](usage.md) and [supported contract](support.md#supported-contract)
 - [Current support matrix](support.md)
 - [Typst Python package and available distributions](https://pypi.org/project/typst/)
 - [Python binding documentation and source](https://github.com/messense/typst-py)

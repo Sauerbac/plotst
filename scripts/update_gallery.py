@@ -7,6 +7,7 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 FIGURES = (
+    "readme-wave-interference",
     "plotst-ordinary",
     "plotst-column-85mm",
     "representative-log-scientific-colorbar",

@@ -2,262 +2,79 @@
 
 [![Windows CI](https://github.com/Sauerbac/plotst/actions/workflows/ci.yml/badge.svg)](https://github.com/Sauerbac/plotst/actions/workflows/ci.yml)
 
-Plotst is an early Python library that uses Typst to measure and typeset text
-inside Matplotlib PDF figures. Matplotlib still owns axes, artists, transforms,
-legends, and figure layout; Typst supplies the text geometry and the actual PDF
-text and mathematics.
+**Typst typography for Matplotlib figures.** Keep your Matplotlib plotting code
+and use Typst to typeset labels and mathematics in publication-ready PDFs.
 
-Plotst is an early library with PDF-only output. It supports ordinary scientific
-figures, native Typst mathematics, and exact physical export sizes.
+<table>
+<tr>
+<th>Python</th>
+<th>Generated PDF</th>
+</tr>
+<tr>
+<td valign="top">
 
-[![Typst math example](docs/gallery/representative-typst-math.png)](docs/gallery/README.md)
+```python
+import matplotlib.pyplot as plt
+import plotst
 
-Explore the [example gallery](docs/gallery/README.md) for PDFs, previews, and
-runnable source, or read the [support matrix](docs/support.md) for current limits.
-The gallery includes playful wave interference, a monkey-saddle landscape,
-and a locally computed three-body orbit, alongside column-width plots, heatmaps,
-mixed vector/raster panels, and annotations with native Typst mathematics.
-The [formatter showcase](docs/gallery/README.md#common-matplotlib-formatters)
-demonstrates dates, categories, percentages, engineering units, locale-aware
-numbers, and custom formatter adapters.
-The showcases pair Comic Sans MS with Cambria Math and Georgia with New Computer
-Modern Math to demonstrate independent text and equation fonts.
+plotst.setup()
+u = ...  # Your 2D data
 
-## Requirements
+fig, ax = plt.subplots()
+image = ax.imshow(u, cmap="RdBu_r", vmin=-2, vmax=2)
+ax.ticklabel_format(scilimits=(0, 0), useMathText=True)
 
-- Windows with Python 3.12, 3.13, or 3.14. Package metadata accepts Python 3.12
-  and newer; future versions need verification before being considered supported.
-- Typst 0.15.0 installed separately and available on `PATH`.
-- Matplotlib 3.11.0 and pypdf 6.10.0 (installed with Plotst).
-- New Computer Modern text and math fonts (included in the official Typst CLI).
+ax.annotate("In phase\n$Delta phi = 0$",
+            xy=(149.5, 149.5), xytext=(35, 70),
+            arrowprops=dict(arrowstyle="->"),
+            bbox=dict(boxstyle="round,pad=0.38",
+                      facecolor="white", edgecolor="#d6e2eb"))
 
-Verified compiler builds are the official `typst 0.15.0 (3ae52774)` release and
-the original local `typst 0.15.0 (c98e9103)` build. Other builds trigger a warning.
-Windows is the current support target; macOS and Linux have not been verified.
+ax.set(xlabel="$x$", ylabel="$y$")
+ax.set_title("When waves meet\n"
+             "$u = sum_(i=1)^2 cos((2 pi r_i)/lambda)$",
+             pad=12, linespacing=1.6)
+fig.colorbar(image, cax=ax.inset_axes([1.05, 0, 0.05, 1]),
+             ticks=[-2, 0, 2], label="Displacement $u$")
 
-## Install from GitHub
-
-Install the Windows archive from [Typst 0.15.0](https://github.com/typst/typst/releases/tag/v0.15.0),
-extract it, and add its directory to `PATH`. Verify it in a new PowerShell window:
-
-```powershell
-typst --version
+plotst.savefig(fig, "figure.pdf")
 ```
 
-With Python and Git installed, create an isolated environment and install Plotst:
+</td>
+<td valign="middle">
+<img src="docs/gallery/readme-wave-interference.png" width="390" alt="Two-source wave interference with white around zero, an arrow annotation with Typst math, scientific axis notation, and a colorbar on the right.">
+</td>
+</tr>
+</table>
+
+`plotst.setup()` checks Typst and sets typography defaults: New Computer Modern
+text and math fonts at 10 pt. Labels use native Typst syntax, including `$...$`
+for math. The [runnable example](examples/readme_example.py) supplies the data
+behind `u = ...` and the preview's figure size and layout.
+[Browse the gallery →](docs/gallery/README.md)
+
+## Install
+
+Plotst is an early library with PDF-only output, currently verified on Windows
+with Python 3.12–3.14. Install [Typst 0.15.0](https://github.com/typst/typst/releases/tag/v0.15.0)
+and add it to `PATH`, then install Plotst from GitHub:
 
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\python -m pip install "plotst @ git+https://github.com/Sauerbac/plotst.git"
 ```
 
-You can use `py -3.13` or `py -3.14` instead. Run your scripts with
-`.\.venv\Scripts\python`. To reproduce an exact revision, append `@<commit-sha>`
-to the Git URL. Plotst is distributed from this repository, not PyPI.
+Supply your 2D data, save the example as `plot.py`, and run it with
+`.\.venv\Scripts\python plot.py`.
+See the [installation guide](docs/installation.md) for other Python versions and setup details.
 
-If you prefer not to install Git, download and extract the repository's ZIP,
-then run `python -m pip install .` from its root in your Python environment.
+## Explore
 
-## Run the examples
-
-Clone the repository and install [uv](https://docs.astral.sh/uv/getting-started/installation/):
-
-```powershell
-git clone https://github.com/Sauerbac/plotst.git
-cd plotst
-uv sync --locked
-uv run python examples\ordinary.py
-uv run python examples\column_width.py
-uv run python examples\representative_figures.py
-uv run python examples\formatter_compatibility.py --locale de-DE
-uv run python examples\font_showcases.py
-uv run python examples\three_body_orbit.py
-```
-
-The example writes `output/pdf/plotst-ordinary.pdf` at exactly 120 mm by 80 mm.
-Generated files under `output/` are ignored by Git. See
-[CONTRIBUTING.md](CONTRIBUTING.md) for tests, builds, and gallery maintenance.
-The formatter example writes `output/pdf/formatter-compatibility.pdf`.
-Its optional `--locale de-DE` selects German numeric formatting for the example
-on Windows; omit it to use the process's current locale. Plotst does not select
-the locale itself.
-The font and orbit showcases additionally need Windows' Comic Sans MS, Georgia,
-and Cambria Math; `typst fonts` lists available families. The orbit is integrated
-locally with NumPy, using the linked catalogue's initial conditions, and needs
-no network access or additional numerical packages.
-
-## Representative support figures
-
-The example corpus combines common publication use cases into four figures:
-
-```powershell
-uv run python examples\representative_figures.py
-```
-
-It produces a log/scientific heatmap with a colorbar, a multi-panel mixed
-vector/raster figure, an annotation-heavy figure, and a math-rich cosine plot
-adapted from Matplotlib's
-[LaTeX text example](https://matplotlib.org/stable/users/explain/text/usetex.html).
-The last figure uses Typst expressions such as `$sum_(n=1)^oo frac(-e^(i pi),
-2^n)$`; Plotst does not interpret LaTeX source or require `text.usetex=True`.
-The concise
-[support matrix](docs/support.md) records the representative features and links
-to the maintained gallery.
-
-## Use Plotst
-
-Call `plotst.setup()` before creating the figure so Matplotlib and Typst begin
-with the same typography defaults. Export explicitly through
-`plotst.savefig()`.
-
-```python
-import matplotlib.pyplot as plt
-import plotst
-
-plotst.setup(
-    font="New Computer Modern",
-    math_font="New Computer Modern Math",
-    font_size=10,
-)
-
-fig, ax = plt.subplots(
-    figsize=(120 / 25.4, 80 / 25.4),
-    layout="constrained",
-)
-ax.plot([0, 1, 2], [0, 1, 4], label="Response $x^2$")
-ax.set_xlabel("Time $t$")
-ax.set_ylabel("Measured value")
-ax.legend()
-
-plotst.savefig(fig, "figure.pdf")
-```
-
-Use `layout="constrained"` to let Matplotlib fit the axes, titles, labels, and
-colorbars within the requested page size using Typst's text measurements.
-The gallery's single-axis examples use this to keep outer whitespace small
-while preserving room for their text.
-
-For a paper column with a fixed final width and little outer whitespace, use
-`tight_width_mm`. Plotst fits the plotted area to the requested width without
-rescaling the fonts. It trims around the title, ticks, labels, legend, and
-other included artists with a small safety margin; the PDF height follows the
-content. For a complete runnable example, use
-[`examples/column_width.py`](examples/column_width.py).
-
-```python
-plotst.savefig(fig, "figure-column.pdf", tight_width_mm=85)
-```
-
-Calling `setup()` again replaces the active process-wide configuration for
-figures created afterward. Loading configuration from a file is deliberately
-deferred; the current interface is Python-only.
-
-## Initial supported contract
-
-- Fixed-size Matplotlib PDF figures and content-cropped PDFs at an exact
-  requested width in millimeters.
-- Ordinary line and scatter figures with linear axes.
-- Titles, axis labels, ordinary numeric ticks, legends, rotation, color, and
-  constrained layout.
-- Built-in scalar and logarithmic ticks, including scientific/additive offsets
-  and colorbar ticks produced by Matplotlib's standard formatters.
-- Date and category ticks, percentages, engineering units, and locale-aware
-  scalar ticks, including their shared offsets.
-- Native Typst prose and inline math in user-authored labels.
-- One Typst inline label per Matplotlib text line. Use Python `\n` when
-  Matplotlib should manage multiple lines.
-- Explicit Matplotlib font size, weight, and style overrides applied through
-  Typst.
-- Mixed vector/raster figures when only non-text artists are rasterized.
-- Text clipping, opacity, drawing order, rotation, and URL annotations retained
-  in the composed PDF.
-- Real PDF text where Typst emits it; the ordinary example is not rasterized.
-
-During an export, Plotst adapts exact instances of Matplotlib's
-`ScalarFormatter`, `LogFormatter`, `LogFormatterMathtext`,
-`LogFormatterSciNotation`, `DateFormatter`, `AutoDateFormatter`,
-`ConciseDateFormatter`, `StrCategoryFormatter`, `PercentFormatter`, and
-`EngFormatter`. Date labels retain their timezone, formatting, and shared date
-offset. Categories, percentage symbols, engineering units, and date callback
-results are escaped as text, including dollar signs and underscores. Real
-newlines remain Matplotlib-managed lines.
-
-Numeric scalar/log Mathtext uses a narrow translation to Typst. Engineering
-formatters and locale-aware scalar formatters use Matplotlib's plain-output
-mode during export, even when configured with `useMathText=True`. Engineering
-prefixes, units, precision, and offsets remain intact; localized scalar
-scientific offsets use plain `1eN` notation. Plotst honors the existing Python
-locale and `useLocale` setting; it does not select or change the process locale.
-`EngFormatter` does not localize its engineering mantissas in Matplotlib.
-Date TeX wrappers are likewise disabled on the export copy; user-provided LaTeX
-in date formats, callbacks, units, or symbols is not translated.
-
-Automatic adapters use shallow export-local copies. The original formatter
-objects, axis associations, and automatic-formatter flags are restored after
-export, including after an error. Subclasses and other custom formatters are
-not automatically replaced; their existing contract remains valid Typst label
-content. These changes do not alter title/axis-label strings or introduce
-general text/markup helpers.
-
-### Custom formatter adapter
-
-See [the runnable formatter showcase](examples/formatter_compatibility.py) for
-all supported families, a batch-aware subclass, and a custom conversion hook.
-
-Opt an existing formatter or subclass that produces plain text into escaping:
-
-```python
-from matplotlib.ticker import FuncFormatter
-
-formatter = FuncFormatter(lambda value, position: f"sample_{value:g}")
-ax.xaxis.set_major_formatter(plotst.adapt_formatter(formatter))
-```
-
-`adapt_formatter` takes a Matplotlib `Formatter` instance. Its default
-conversion escapes completed tick labels and offsets as literal text. For
-numeric subclasses, configure `useMathText=False` and `usetex=False`; this
-wrapper does not detect or translate Mathtext or LaTeX. A formatter already
-producing Typst can continue to be installed directly without a wrapper.
-
-For a custom conversion, pass `convert=callable`. It receives one completed
-string at a time (including empty strings and offset strings) and must return
-valid Typst content. The same callback applies to individual calls, batch
-results, and offsets. The formatter retains responsibility for formatting
-values; the callback only converts the resulting labels.
-
-The adapter forwards axis and locator assignment, tick locations, the full
-`format_ticks(values)` batch, and `get_offset()`. This preserves custom batch
-logic rather than reducing it to individual calls. `format_data` and
-`format_data_short` delegate without conversion. The wrapped formatter's
-normal draw-time state may change. Install the wrapper with Matplotlib's
-major/minor formatter setters; wrapped subclasses are never automatically
-treated as built-ins. A wrapper emits Typst source and is intended for Plotst
-exports, not ordinary Matplotlib rendering.
-
-Typst-internal multiline blocks, explicit movement, baseline shifts, page
-operations, deliberate overflow, arbitrary `bbox_inches` options, rasterized text or
-text-containing containers, interactive rendering, SVG/PNG export, and
-arbitrary LaTeX/Mathtext conversion are not supported by this first slice.
-
-## How PDF composition works
-
-For each distinct label needed during one export, Plotst asks the Typst CLI for
-its measurements and a small PDF containing that label. Matplotlib lays out and
-draws the figure using those measurements. pypdf installs the label PDFs as Form
-XObjects at the positions already recorded in Matplotlib's drawing stream. This
-preserves the tested ordering, clipping, opacity, vector graphics, and PDF text.
-
-The per-export artifact table is discarded after `savefig()` returns. There is
-no persistent cache, cross-export cache, batching layer, or cache invalidation
-system yet.
-
-## Diagnostics
-
-`setup()` checks the configured Typst executable immediately. During export,
-invalid Typst source identifies the failing label and includes the compiler
-diagnostic. Typst warnings, including missing-font substitution, are treated as
-errors so typography cannot silently change.
-
-## License
+- [Gallery](docs/gallery/README.md) — figures, PDFs, and source.
+- [Examples](examples/README.md) — setup and commands to run the demonstrations.
+- [Usage](docs/usage.md) — fonts, exact export sizes, and custom formatters.
+- [Supported figures and limits](docs/support.md).
+- [How it works](docs/how-it-works.md) — text measurement and PDF composition.
+- [Contributing](CONTRIBUTING.md) — tests, builds, and gallery maintenance.
 
 Plotst is available under the [MIT license](LICENSE).

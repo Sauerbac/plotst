@@ -75,6 +75,8 @@ jobs:
         run: uv run --locked pytest -q -W error::plotst.UntestedTypstWarning
       - name: Generate ordinary example
         run: uv run --locked python examples/ordinary.py
+      - name: Generate README example
+        run: uv run --locked python examples/readme_example.py
       - name: Generate column-width example
         run: uv run --locked python examples/column_width.py
       - name: Generate representative examples

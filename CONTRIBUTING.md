@@ -27,7 +27,7 @@ The font showcases also use Windows' Comic Sans MS, Georgia, and Cambria Math.
 Run `typst fonts` to check these before generating the gallery; missing fonts
 are errors rather than silent substitutions.
 
-The CI matrix runs tests, all six example scripts, package builds, and a fresh
+The CI matrix runs tests, all seven example scripts, package builds, and a fresh
 wheel-installation smoke test on Windows with Python 3.12, 3.13, and 3.14.
 It uploads PDFs and build files as temporary workflow artifacts. It does not
 publish packages or deploy a website.
@@ -36,6 +36,7 @@ publish packages or deploy a website.
 
 ```powershell
 uv run python examples/ordinary.py
+uv run python examples/readme_example.py
 uv run python examples/column_width.py
 uv run python examples/representative_figures.py
 uv run python examples/formatter_compatibility.py --locale de-DE
@@ -44,7 +45,7 @@ uv run python examples/three_body_orbit.py
 uv run python scripts/update_gallery.py
 ```
 
-Review the ten previews in `docs/gallery/` before committing them. The script
+Review the eleven previews in `docs/gallery/` before committing them. The script
 copies only the curated PDFs from ignored `output/pdf/` and renders PNG previews
 with Poppler. It does not change the example designs or copy experimental evidence.
 

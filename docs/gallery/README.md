@@ -9,7 +9,9 @@ content crop to give the plotted data more room while keeping labels and titles
 readable. The showcases also use compact shared headers and footers.
 Each example below links to its runnable source.
 
-Run the commands from the repository root after `uv sync --locked`.
+To regenerate these figures, follow the [examples guide](../../examples/README.md)
+for setup, commands, and font requirements. Run the commands below from the
+repository root.
 
 ## Common Matplotlib formatters
 
@@ -144,6 +146,18 @@ links. 156 x 92 mm.
 [![Annotation-rich figure](representative-annotations.png)](representative-annotations.pdf)
 
 [Source](../../examples/representative_figures.py#L220) · `uv run python examples/representative_figures.py`
+
+## The README example
+
+A compact wave-interference example with a blue–white–red colormap centered on
+zero, a math-rich arrow annotation, scientific notation on both axes, a colorbar
+on the right, and a native Typst equation. Axes show array
+indices; the README omits data generation and preview layout settings.
+88.9 × 101.6 mm, using the bundled New Computer Modern fonts.
+
+[![Compact wave-interference example](readme-wave-interference.png)](readme-wave-interference.pdf)
+
+[Source](../../examples/readme_example.py) · `uv run python examples/readme_example.py`
 
 See the [support matrix](../support.md) for boundaries and
 [contributor guide](../../CONTRIBUTING.md#refresh-the-gallery) to regenerate previews.
