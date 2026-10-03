@@ -50,7 +50,7 @@ def test_configured_math_font_changes_the_embedded_math_font(
     axis.plot([0, 1, 2], [0, 1, 0])
     axis.set_xlabel("Elapsed time $t$ (s)")
     axis.set_ylabel("Energy $E_0$")
-    axis.set_title("Math $frac(sum_(k=1)^n k^2, sqrt(alpha))$")
+    axis.set_title("Math $(sum_(k=1)^n k^2)/sqrt(alpha)$")
 
     results = {}
     try:

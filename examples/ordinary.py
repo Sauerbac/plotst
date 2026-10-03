@@ -26,7 +26,7 @@ y = [value**2 for value in x]
 axis.plot(x, y, label="Response $f(x) = x^2$")
 axis.scatter(x, y, color="#bd561f", zorder=3)
 axis.set_xlabel("Time $t$ (s)")
-axis.set_ylabel("Normalized response $frac(y, y_0)$")
+axis.set_ylabel("Normalized response $y/y_0$")
 axis.set_title("Typst measured figure", fontsize=12, fontweight="bold")
 axis.legend(loc="upper left", fontsize=8)
 

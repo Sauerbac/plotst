@@ -30,7 +30,7 @@ def test_constrained_layout_keeps_labels_inside_fixed_page(tmp_path: Path) -> No
     )
     axis.plot([0, 0.5, 1, 1.5, 2], [0, 0.25, 1, 2.25, 4])
     axis.set_xlabel("Time $t$ (s)")
-    axis.set_ylabel("Normalized response $frac(y, y_0)$")
+    axis.set_ylabel("Normalized response $y/y_0$")
     axis.set_title("Typst measured figure", fontsize=12, fontweight="bold")
     destination = tmp_path / "fixed-page.pdf"
 

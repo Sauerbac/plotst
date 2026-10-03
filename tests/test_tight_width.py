@@ -29,7 +29,7 @@ def test_tight_export_fits_all_labels_at_exact_column_width(
     figure, axis = plt.subplots(figsize=(4.5, 2.7), layout="constrained")
     axis.plot([0, 1, 2], [0, 1, 0], label="Response $f(t)$")
     axis.set_xlabel("Elapsed time $t$ (s)")
-    axis.set_ylabel("Measured response $frac(y, y_0)$")
+    axis.set_ylabel("Measured response $y/y_0$")
     axis.set_title("A publication column figure")
     axis.legend()
     original_size = figure.get_size_inches().copy()

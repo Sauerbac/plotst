@@ -169,7 +169,7 @@ def orbit_showcase(times: np.ndarray, states: np.ndarray) -> Figure:
     for axis in [orbit, detail, separation]:
         axis.spines[["top", "right"]].set_visible(False)
     fig.suptitle("Three bodies. Forty-nine twists.\n"
-                  "$frac(dif^2 bold(r)_i, dif t^2) = sum_(j != i) frac(bold(r)_j - bold(r)_i, abs(bold(r)_j - bold(r)_i)^3)"
+                  "$(dif^2 bold(r)_i)/(dif t^2) = sum_(j != i) (bold(r)_j - bold(r)_i)/abs(bold(r)_j - bold(r)_i)^3"
                   ", quad G = m_1 = m_2 = m_3 = 1$", fontsize=14)
     fig.supxlabel(f"$T = {PERIOD:.6f}$ / Local float64 integration, no forced closure\n"
                   f"Position closure: {closure:.1e} / max relative energy drift: {drift:.1e}\n"

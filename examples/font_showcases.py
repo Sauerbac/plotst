@@ -73,7 +73,7 @@ def wave_interference() -> Figure:
     profile.grid(alpha=0.18)
     profile.text(0.5, 0.93, "$y = 1.3$", transform=profile.transAxes, ha="center", va="top")
     fig.suptitle("When ripples meet\n"
-                 "$u(x,y) = cos(k r_1) + cos(k r_2), quad k = frac(2 pi, lambda)$",
+                 "$u(x,y) = cos(k r_1) + cos(k r_2), quad k = (2 pi)/lambda$",
                  fontsize=14)
     fig.supxlabel("Comic Sans MS labels  /  Cambria Math equations", fontsize=8)
     return fig

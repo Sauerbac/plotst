@@ -284,7 +284,7 @@ def annotation_showcase() -> Figure:
     axis.text(
         0.34,
         0.74,
-        "$frac(sum_(k=1)^n k^2, sqrt(alpha^2 + beta^2))$",
+        "$(sum_(k=1)^n k^2)/sqrt(alpha^2 + beta^2)$",
         transform=axis.transAxes,
         fontsize=14,
         fontweight="bold",
@@ -344,7 +344,7 @@ def typst_math_demo() -> Figure:
     axis.set_xlabel("Time $t$ (s)", fontweight="bold")
     axis.set_ylabel("Velocity (°/s)", fontstyle="italic")
     axis.set_title(
-        "Typst is Number $sum_(n=1)^oo frac(-e^(i pi), 2^n)$!",
+        "Typst is Number $sum_(n=1)^oo (-e^(i pi))/2^n$!",
         fontsize=13,
         color=RED,
         pad=14,

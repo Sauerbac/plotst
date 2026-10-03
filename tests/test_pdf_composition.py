@@ -66,7 +66,7 @@ def test_pdf_preserves_text_geometry_and_drawing_state(tmp_path: Path) -> None:
     figure.text(
         0.05,
         0.08,
-        "$frac(sum_(i=1)^n i, sqrt(x))$",
+        "$(sum_(i=1)^n i)/sqrt(x)$",
         fontsize=16,
         fontweight="bold",
         zorder=4,
